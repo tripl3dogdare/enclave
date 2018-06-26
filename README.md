@@ -2,7 +2,7 @@
 A Discord library for JVM Kotlin, designed to be simple, concise, and easy to use.
 
 Enclave takes heavy inspiration from [discordrb](https://github.com/meew0/discordrb/)
-for Ruby and [discordcr](https://github.com/meew0/discordcr/), so a lot of the basic
+for Ruby and [discordcr](https://github.com/meew0/discordcr/) for Crystal, so a lot of the basic
 code structure should feel familiar to users of those libraries. With that said, no
 code here was directly taken from any other existing Discord library, right down to
 the Gateway implementation.
