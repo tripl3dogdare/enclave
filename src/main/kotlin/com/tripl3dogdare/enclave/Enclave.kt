@@ -18,6 +18,11 @@ class Enclave(val token:String, startImmediately:Boolean=true) : EventContainer(
     return this
   }
 
+  override fun include(other:EventContainer):Enclave {
+    super.include(other)
+    return this
+  }
+
   companion object {
     val WEBSITE = "https://github.com/tripl3dogdare/enclave"
     val VERSION = "0.0.1a"
