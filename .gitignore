@@ -1,0 +1,6 @@
+*gradle*
+!build.gradle
+.idea/
+out/
+clean_build_cache.bat
+.auth
