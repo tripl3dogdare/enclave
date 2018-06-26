@@ -1,6 +1,8 @@
 *gradle*
 !build.gradle
 .idea/
+build/
 out/
 clean_build_cache.bat
 .auth
+*.iml
