@@ -41,5 +41,7 @@ abstract class EventContainer {
 
   companion object {
     data class Listener(val c:KClass<Event>, val f:(Event) -> Unit)
+    operator fun invoke(body: EventContainer.() -> Unit) =
+      (object : EventContainer() {}).apply(body)
   }
 }
