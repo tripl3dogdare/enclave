@@ -26,7 +26,7 @@ class Gateway(val token:String, val dispatchHandler:(Event) -> Unit) {
     if(ws != null) disconnect()
 
     lateinit var task:TimerTask
-    task = timer.setInterval(15000) {
+    task = timer.setInterval(30000) {
       ws = WebsocketClient.nonBlocking(Uri.of(gateway_url), onConnect = { ws ->
         ws.send(if(session != "") pkt_resume() else pkt_identify)
         ws.onClose(::onDisconnect)
