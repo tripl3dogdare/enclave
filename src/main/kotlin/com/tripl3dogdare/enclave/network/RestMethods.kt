@@ -139,4 +139,54 @@ fun Rest.modifyGuildEmbed(gid:String, data:JsonNode?) =
 fun Rest.getGuildVanityUrl(gid:String) =
   send(GET, "/guilds/$gid/vanity-url")
 
-// TODO: Pick up from Invite endpoints
+fun Rest.getInvite(inv:String, query: Map<String, String>?) =
+  send(GET, "/invites/$inv", query=query)
+fun Rest.deleteInvite(inv:String) =
+  send(DELETE, "/invites/$inv")
+
+fun Rest.getCurrentUser() =
+  send(GET, "/users/@me")
+fun Rest.getUser(uid:String) =
+  send(GET, "/users/$uid")
+fun Rest.modifyCurrentUser(data: JsonNode?) =
+  send(PATCH, "/users/@me", data=data)
+fun Rest.getCurrentUserGuilds(query: Map<String, String>?) =
+  send(GET, "/users/@me/guilds", query=query)
+fun Rest.leaveGuild(gid:String) =
+  send(DELETE, "/users/@me/guilds/$gid")
+fun Rest.getUserDMs() =
+  send(GET, "/users/@me/channels")
+fun Rest.createDM(data: JsonNode?) =
+  send(POST, "/users/@me/channels", data=data)
+fun Rest.createGroupDM(data: JsonNode?) =
+  send(POST, "/users/@me/channels", data=data)
+fun Rest.getUserConnections() =
+  send(GET, "/users/@me/connections")
+
+fun Rest.listVoiceRegions() =
+  send(GET, "/voice/regions")
+
+fun Rest.createWebhook(cid:String, data:JsonNode?) =
+  send(POST, "/channels/$cid/webhooks", data=data)
+fun Rest.getChannelWebhooks(cid:String) =
+  send(GET, "/channels/$cid/webhooks")
+fun Rest.getGuildWebhooks(gid:String) =
+  send(GET, "/guilds/$gid/webhooks")
+fun Rest.getWebhook(wid:String) =
+  send(GET, "/webhooks/$wid")
+fun Rest.getWebhookWithToken(wid:String, wtk:String) =
+  send(GET, "/webhooks/$wid/$wtk")
+fun Rest.modifyWebhook(wid:String, data:JsonNode?) =
+  send(PATCH, "/webhooks/$wid", data=data)
+fun Rest.modifyWebhookWithToken(wid:String, wtk:String, data:JsonNode?) =
+  send(PATCH, "/webhooks/$wid/$wtk", data=data)
+fun Rest.deleteWebhook(wid:String) =
+  send(DELETE, "/webhooks/$wid")
+fun Rest.deleteWebhookWithToken(wid:String, wtk: String) =
+  send(DELETE, "/webhooks/$wid/$wtk")
+fun Rest.executeWebhook(wid:String, wtk: String, data:JsonNode?) =
+  send(POST, "/webhooks/$wid/$wtk", data=data)
+fun Rest.executeSlackCompatibleWebhook(wid:String, wtk: String, data:JsonNode?) =
+  send(POST, "/webhooks/$wid/$wtk/slack", data=data)
+fun Rest.executeGitHubCompatibleWebhook(wid:String, wtk: String, data:JsonNode?) =
+  send(POST, "/webhooks/$wid/$wtk/github", data=data)
