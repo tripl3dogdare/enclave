@@ -30,18 +30,15 @@ import org.http4k.format.Jackson.asJsonObject
 private lateinit var client:Enclave
 
 fun main(args:Array<String>) {
-  client = Enclave("YOUR-TOKEN-HERE")
-  client.include(TestBotEvents)
+  client = Enclave("YOUR-TOKEN-HERE").include(TestBotEvents)
 }
 
-object TestBotEvents : EventContainer() {
-  init {
-    on<ReadyEvent> { ev -> println("Ready!") }
-
-    on<MessageCreateEvent> { ev ->
-      if(ev.raw["content"].textValue().startsWith("!ping"))
-        client.rest.createMessage(ev.raw["channel_id"].textValue(), """ {"content":"Pong!"} """.asJsonObject())
-    }
+val TestBotEvents = EventContainer {
+  on<ReadyEvent> { ev -> println("Ready!") }
+    
+  on<MessageCreateEvent> { ev ->
+    if(ev.raw["content"].textValue().startsWith("!ping"))
+      client.rest.createMessage(ev.raw["channel_id"].textValue(), """ {"content":"Pong!"} """.asJsonObject())
   }
 }
 ```
