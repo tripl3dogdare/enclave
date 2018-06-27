@@ -1,5 +1,6 @@
-package com.tripl3dogdare.enclave.util
+package com.tripl3dogdare.enclave.network
 
+import com.tripl3dogdare.enclave.util.TimerTask
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
