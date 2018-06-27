@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.Method.*
 
 fun Rest.getGatewayUrl() =
-  send(GET, "/gateway")["url"].asText()+"?v=6&encoding=json"
+  sendSync(GET, "/gateway")["url"].asText()+"?v=6&encoding=json"
 fun Rest.getGuildAuditLogs(gid:String) =
   send(GET, "/guilds/%s/audit-logs", gid)
 
