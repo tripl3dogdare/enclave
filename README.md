@@ -8,9 +8,22 @@ code here was directly taken from any other existing Discord library, right down
 the Gateway implementation.
 
 ## Installation
-Enclave is not available as a managed dependency yet. 
-If you would like to use it ***at your own risk***, you can download and
-build the source manually.
+Enclave is not available on Maven/JCenter/etc. yet. If you'd like to
+use it, you can build it from source code manually, or install it with
+[JitPack](https://jitpack.io/#tripl3dogdare/enclave):
+
+```groovy
+allprojects {
+    repositories {
+        // ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    implementation 'com.github.tripl3dogdare:enclave:-SNAPSHOT'
+}
+```
 
 ***Be warned that Enclave is still under heavy development.
 It comes with no guarantees as to functionality or respecting
@@ -19,6 +32,22 @@ who isn't absolutely sure they know what they're doing.*** I am striving
 to reach the point where I can give those guarantees, but as it
 stands, Enclave is definitely not the library you want to use if
 you're looking to build a good, API-respecting, bulletproof bot.
+
+## Development Todo List
+
+- [x] Basic Gateway connection
+- [x] Event listeners and dispatch
+- [x] Methods for all the API endpoints
+- [x] Ratelimiting on API endpoints
+- [ ] Proper event/data classes instead of raw JSON payloads
+- [ ] Caching of API results and event data
+- [ ] Convenience methods for common API actions
+- [ ] Command framework
+- [ ] General QoL improvements (utility methods, hiding 
+      implementation details, modularity, etc.)
+- [ ] Detailed documentation
+- [ ] Publish to dependency management sites
+- [ ] Submit to Discord API server
 
 ## Examples
 This example is kept up to date with the current state of the library.
