@@ -1,11 +1,10 @@
 # Enclave
 A Discord library for JVM Kotlin, designed to be simple, concise, and easy to use.
+It is implemented entirely in pure Kotlin, with as few external libraries as possible.
 
-Enclave takes heavy inspiration from [discordrb](https://github.com/meew0/discordrb/)
-for Ruby and [discordcr](https://github.com/meew0/discordcr/) for Crystal, so a lot of the basic
-code structure should feel familiar to users of those libraries. With that said, no
-code here was directly taken from any other existing Discord library, right down to
-the Gateway implementation.
+Enclave takes heavy stylistic inspiration from [discordrb](https://github.com/meew0/discordrb/)
+for Ruby and [discordcr](https://github.com/meew0/discordcr/) for Crystal, so a lot of 
+the basic code structure should feel familiar to users of those libraries.
 
 ## Installation
 Enclave is not available on Maven/JCenter/etc. yet. If you'd like to
@@ -21,7 +20,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.tripl3dogdare:enclave:-SNAPSHOT'
+    implementation 'com.github.tripl3dogdare:enclave:master-SNAPSHOT'
 }
 ```
 
