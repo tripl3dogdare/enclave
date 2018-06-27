@@ -13,10 +13,11 @@ class Rest(val token:String, val httpClient:HttpHandler=JavaHttpClient()) {
   fun send(
     method:Method,
     path:String,
+    vararg urlParams:Any,
     query:Map<String, String>? = null,
     data:JsonNode? = null
   ):JsonNode {
-    val req = Request(method, Enclave.API_URL+path)
+    val req = Request(method, Enclave.API_URL+path.format(*urlParams))
       .header("User-Agent", "DiscordBot (${Enclave.WEBSITE}, ${Enclave.VERSION})")
       .header("Authorization", "Bot $token")
       .header("Content-Type", "application/json")
