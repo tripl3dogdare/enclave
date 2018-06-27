@@ -3,7 +3,6 @@ package com.tripl3dogdare.enclave.network
 import com.tripl3dogdare.enclave.Enclave
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.tripl3dogdare.enclave.util.RateLimiter
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import org.http4k.client.JavaHttpClient
