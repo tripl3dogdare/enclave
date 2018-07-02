@@ -12,18 +12,18 @@ fun main(args:Array<String>) {
 }
 
 val TestBotEvents = EventContainer {
-  on { ev:ReadyEvent -> println(ev.raw) }
+//  on { ev:ReadyEvent -> println(ev.raw) }
 //    once { _:PresenceUpdateEvent -> println("boop") }
 //    every(3) { _:PresenceUpdateEvent -> println("test") }
 //    randomly(75) { _:PresenceUpdateEvent -> println("random!") }
 
-  on { ev:MessageEvent -> when(ev) {
-    is MessageCreateEvent -> println(ev.raw["content"].textValue())
-    is MessageDeleteEvent -> println("Message deleted.")
-  }}
+//  on { ev:MessageEvent -> when(ev) {
+//    is MessageCreateEvent -> println(ev.raw["content"].textValue())
+//    is MessageDeleteEvent -> println("Message deleted.")
+//  }}
 
   on { ev:MessageCreateEvent ->
-    if(ev.raw["content"].textValue().startsWith("!ping"))
-      client.rest.createMessage(ev.raw["channel_id"].textValue(), """ {"content":"Pong!"} """.asJsonObject())
+    if(ev.content.startsWith("!ping"))
+      client.rest.createMessage(ev.channelId, """ {"content":"Pong!"} """.asJsonObject())
   }
 }

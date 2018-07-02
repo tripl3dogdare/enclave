@@ -3,6 +3,7 @@ package com.tripl3dogdare.enclave.network
 import com.tripl3dogdare.enclave.Enclave
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.tripl3dogdare.enclave.util.Snowflake
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import org.http4k.client.JavaHttpClient
@@ -17,7 +18,7 @@ class Rest(val token:String, httpClient:HttpHandler=JavaHttpClient()) {
   fun send(
     method:Method,
     path:String,
-    vararg urlParams:Any,
+    vararg urlParams: Snowflake,
     query:Map<String, String>? = null,
     data:JsonNode? = null
   ) = async {
@@ -38,7 +39,7 @@ class Rest(val token:String, httpClient:HttpHandler=JavaHttpClient()) {
   fun sendSync(
     method:Method,
     path:String,
-    vararg urlParams:Any,
+    vararg urlParams: Snowflake,
     query:Map<String, String>? = null,
     data:JsonNode? = null
   ) =
