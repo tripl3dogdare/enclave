@@ -24,6 +24,7 @@ dependencies {
     compile group: "org.http4k", name: "http4k-core", version: "3.31.0"
     compile group: "org.http4k", name: "http4k-client-websocket", version: "3.31.0"
     compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.3'
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.2.50'
     compile 'com.github.kotlin-graphics:kotlin-unsigned:v2.1'
     compile name: 'haven-json-1.0.0'
 }
