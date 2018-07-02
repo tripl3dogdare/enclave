@@ -22,9 +22,8 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile group: "org.http4k", name: "http4k-core", version: "3.31.0"
     compile group: "org.http4k", name: "http4k-client-websocket", version: "3.31.0"
-    compile group: "org.http4k", name: "http4k-format-jackson", version: "3.31.0"
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
     compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.3'
+    compile 'com.github.kotlin-graphics:kotlin-unsigned:v2.1'
 }
 
 compileKotlin {
