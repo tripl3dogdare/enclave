@@ -9,11 +9,12 @@ import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import com.fasterxml.jackson.module.kotlin.*
+import com.tripl3dogdare.enclave.Enclave
 import com.tripl3dogdare.enclave.event.Event
 import java.util.*
 
-class Gateway(val token:String, val dispatchHandler:(Event) -> Unit) {
-  private val gateway_url = Rest("").getGatewayUrl()
+class Gateway(val token:String, val dispatchHandler:(Event) -> Unit, val client:Enclave) {
+  private val gateway_url = client.rest.getGatewayUrl()
 
   private var hbseq = 0
   private var session = ""
@@ -54,7 +55,7 @@ class Gateway(val token:String, val dispatchHandler:(Event) -> Unit) {
     if(data.op == DISPATCH && data.t == "READY") session = data.d["session_id"].asText()
 
     when(data.op) {
-      DISPATCH -> dispatchHandler(Event.from(data.t!!, data.d))
+      DISPATCH -> dispatchHandler(Event.from(data.t!!, data.d, client))
       RECONNECT -> login()
       INVALID_SESSION -> {
         Thread.sleep(1500)
