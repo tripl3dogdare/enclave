@@ -59,7 +59,7 @@ package testbot
 import com.tripl3dogdare.enclave.Enclave
 import com.tripl3dogdare.enclave.event.*
 import com.tripl3dogdare.enclave.network.*
-import org.http4k.format.Jackson.asJsonObject
+import com.tripl3dogdare.havenjson.Json
 
 private lateinit var client:Enclave
 
@@ -68,11 +68,11 @@ fun main(args:Array<String>) {
 }
 
 val TestBotEvents = EventContainer {
-  on<ReadyEvent> { ev -> println("Ready!") }
+  on { ev:ReadyEvent -> println("Ready!") }
     
-  on<MessageCreateEvent> { ev ->
-    if(ev.raw["content"].textValue().startsWith("!ping"))
-      client.rest.createMessage(ev.raw["channel_id"].textValue(), """ {"content":"Pong!"} """.asJsonObject())
+  on { ev:MessageCreateEvent ->
+    if(ev.content.startsWith("!ping"))
+      client.rest.createMessage(ev.channelId, Json("content" to "Pong!"))
   }
 }
 ```
