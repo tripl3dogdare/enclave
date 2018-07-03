@@ -1,11 +1,7 @@
 package com.tripl3dogdare.enclave.data
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonToken
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.havenjson.Json
 import java.util.*
 
 enum class Permission(val value:Int) {
@@ -45,6 +41,8 @@ typealias Permissions = EnumSet<Permission>
 fun Permissions.toInt() = this.toTypedArray().fold(0) { a, b -> a or b.value }
 infix fun Permissions.and(other:Permission):Permissions = Permissions.of(other, *this.toTypedArray())
 
+fun permissionsFrom(raw:Json) =
+  try { permissionsFrom(raw.asInt!!) } catch(_:NullPointerException) { null }
 fun permissionsFrom(n:Int):Permissions {
   val perms = Permission.values().filter { n and it.value != 0 }
   return Permissions.of(perms[0], *perms.drop(1).toTypedArray())
@@ -53,13 +51,13 @@ fun permissionsFrom(n:Int):Permissions {
 data class PermissionOverwrite(
   val id: Snowflake,
   val type:String,
-  @JsonDeserialize(using=JsonPermissions::class) val allow:Permissions,
-  @JsonDeserialize(using=JsonPermissions::class) val deny:Permissions
-)
-
-class JsonPermissions : JsonDeserializer<Permissions>() {
-  override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?):Permissions {
-    if(p?.currentToken == JsonToken.VALUE_NUMBER_INT) return permissionsFrom(p.intValue)
-    return Permissions.noneOf(Permission::class.java)
-  }
-}
+  val allow:Permissions,
+  val deny:Permissions
+) { companion object {
+  fun fromJson(raw:Json) = try { PermissionOverwrite(
+    id = Snowflake.fromString(raw["id"].asString)!!,
+    type = raw["type"].asString!!,
+    allow = permissionsFrom(raw["allow"])!!,
+    deny = permissionsFrom(raw["deny"])!!
+  )} catch(_:NullPointerException) { null }
+}}
