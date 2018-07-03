@@ -1,12 +1,12 @@
 package com.tripl3dogdare.enclave.network
 
 import com.tripl3dogdare.enclave.util.TimerTask
+import com.tripl3dogdare.havenjson.Json
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import java.time.Instant
 import java.util.*
-import org.http4k.format.Jackson.asJsonObject
 
 class RateLimiter(val httpClient:HttpHandler) {
   val global_bucket = Bucket()
@@ -31,7 +31,7 @@ class RateLimiter(val httpClient:HttpHandler) {
     } else {
       var resp = limitFrom(path, httpClient(req))
       while(resp.status.code == 429) {
-        Thread.sleep(resp.bodyString().asJsonObject()["retry_after"].longValue())
+        Thread.sleep(Json.parse(resp.bodyString())["retry_after"].asInt!!.toLong())
         resp = limitFrom(path, httpClient(req))
       }
       resp
