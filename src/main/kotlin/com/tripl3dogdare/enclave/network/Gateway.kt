@@ -2,15 +2,14 @@ package com.tripl3dogdare.enclave.network
 
 import com.tripl3dogdare.enclave.util.*
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.client.WebsocketClient
 import org.http4k.core.Uri
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
-import com.fasterxml.jackson.module.kotlin.*
 import com.tripl3dogdare.enclave.Enclave
 import com.tripl3dogdare.enclave.event.Event
+import com.tripl3dogdare.havenjson.Json
 import java.util.*
 
 class Gateway(val token:String, val dispatchHandler:(Event) -> Unit, val client:Enclave) {
@@ -46,26 +45,32 @@ class Gateway(val token:String, val dispatchHandler:(Event) -> Unit, val client:
     return this
   }
 
-  data class GatewayMessage(val op:Int, val d:JsonNode, val s:Int?, val t:String?)
+  data class GatewayMessage(val op:Int, val d:Json, val s:Int?, val t:String?)
 
   private fun onMessage(msg:WsMessage) {
-    val data:GatewayMessage = jacksonObjectMapper().readValue(msg.bodyString())
+    val rawdata = Json.parse(msg.bodyString())
+    val data = GatewayMessage(
+      rawdata["op"].asInt!!,
+      rawdata["d"],
+      rawdata["s"].asInt,
+      rawdata["t"].asString
+    )
 
     if(data.s != null) hbseq = data.s
-    if(data.op == DISPATCH && data.t == "READY") session = data.d["session_id"].asText()
+    if(data.op == DISPATCH && data.t == "READY") session = data.d["session_id"].asString!!
 
     when(data.op) {
       DISPATCH -> dispatchHandler(Event.from(data.t!!, data.d, client))
       RECONNECT -> login()
       INVALID_SESSION -> {
         Thread.sleep(1500)
-        if(!data.d.booleanValue()) session = ""
+        if(!data.d.asBoolean!!) session = ""
         login()
       }
 
       HELLO -> {
         hbtask?.cancel()
-        hbtask = timer.setInterval(data.d["heartbeat_interval"].asLong()) {
+        hbtask = timer.setInterval(data.d["heartbeat_interval"].asInt!!.toLong()) {
           if(!lastack || ws == null) login()
           else {
             ws?.send(pkt_heartbeat())

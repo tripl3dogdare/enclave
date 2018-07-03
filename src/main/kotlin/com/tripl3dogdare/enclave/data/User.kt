@@ -1,9 +1,10 @@
 package com.tripl3dogdare.enclave.data
 
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonValue
 import com.tripl3dogdare.enclave.util.IdObject
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.havenjson.Json
+import java.time.Instant
+import java.time.ZonedDateTime
 import java.util.*
 
 interface UserLike : IdObject {
@@ -25,36 +26,71 @@ data class User(
   override val mfaEnabled:Boolean?,
   override val verified:Boolean?,
   override val email:String?
-) : UserLike
+) : UserLike { companion object {
+  fun fromJson(raw:Json) = try { User(
+    id = Snowflake.fromString(raw["id"].asString)!!,
+    username = raw["username"].asString!!,
+    discriminator = raw["discriminator"].asString!!,
+    avatar = raw["avatar"].asString!!,
+    bot = raw["bot"].asBoolean,
+    mfaEnabled = raw["mfa_enabled"].asBoolean,
+    verified = raw["verified"].asBoolean,
+    email = raw["email"].asString
+  )} catch(_:NullPointerException) { null }
+}}
 
 data class Member(
   val user:User,
   val nick:String?,
-  val roles:Array<Snowflake>,
+  val roles:List<Snowflake>,
   val deaf:Boolean,
   val mute:Boolean,
-  val joinedAt: Date?
-) : UserLike by user
+  val joinedAt: ZonedDateTime?
+) : UserLike by user { companion object {
+  fun fromJson(raw:Json) = fromJson(raw, raw["user"])
+  fun fromJson(raw:Json, user:Json) = try { Member(
+    user = User.fromJson(user)!!,
+    nick = raw["nick"].asString,
+    roles = raw["roles"].asList.orEmpty().map { Snowflake.fromString(it.asString) }.filterNotNull(),
+    deaf = raw["deaf"].asBoolean!!,
+    mute = raw["mute"].asBoolean!!,
+    joinedAt = raw["joined_at"].asString?.let { ZonedDateTime.parse(it) }
+  )} catch(_:NullPointerException) { null }
+}}
 
 data class UserConnection(
   val id:String,
   val name:String,
   val type:String,
   val revoked:Boolean,
-  val integrations:Array<Integration>
-)
+  val integrations:List<Integration>
+) { companion object {
+  fun fromJson(raw:Json) = try { UserConnection(
+    id = raw["id"].asString!!,
+    name = raw["name"].asString!!,
+    type = raw["type"].asString!!,
+    revoked = raw["revoked"].asBoolean!!,
+    integrations = raw["integrations"].asList.orEmpty().map(Integration.Companion::fromJson).filterNotNull()
+  )} catch(e:NullPointerException) { null }
+}}
 
 data class Presence(
   val user:User,
-  val roles:Array<Snowflake>,
+  val roles:List<Snowflake>,
   val game:Activity?,
   val guildId: Snowflake,
   val status:Status
 ) : UserLike by user {
-  enum class Status {
-    IDLE, DND, ONLINE, OFFLINE;
-    @JsonValue fun toValue() = name.toLowerCase()
-    @JsonCreator fun fromValue(key:String) = Status.valueOf(key.toUpperCase())
+  enum class Status { IDLE, DND, ONLINE, OFFLINE; }
+
+  companion object {
+    fun fromJson(raw:Json) = try { Presence(
+      user = User.fromJson(raw["user"])!!,
+      roles = raw["roles"].asList.orEmpty().map { Snowflake.fromString(it.asString) }.filterNotNull(),
+      game = Activity.fromJson(raw["game"]),
+      guildId = Snowflake.fromString(raw["guild_id"].asString)!!,
+      status = Status.valueOf(raw["status"].asString!!.toUpperCase())
+    )} catch(e:NullPointerException) { null }
   }
 
   data class Activity(
@@ -77,5 +113,29 @@ data class Presence(
       val smallImage:String?,
       val smallText:String?
     )
+
+    companion object {
+      fun fromJson(raw:Json) = try { Activity(
+        name = raw["name"].asString!!,
+        type = Type.values()[raw["type"].asInt!!],
+        url = raw["url"].asString,
+        timestamps = Timestamps(raw["timestamps"]["start"].asInt, raw["timestamps"]["end"].asInt),
+        applicationId = Snowflake.fromString(raw["application_id"].asString)!!,
+        details = raw["details"].asString,
+        state = raw["state"].asString,
+
+        party = raw["party"].asMap?.let { Party(
+          it["id"]?.asString,
+          it["size"]?.asList?.let { Pair(it[0].asInt!!, it[1].asInt!!) }
+        )},
+
+        assets = raw["assets"].asMap?.let { Assets(
+          it["large_image"]?.asString,
+          it["large_text"]?.asString,
+          it["small_image"]?.asString,
+          it["small_text"]?.asString
+        )}
+      )} catch(e:NullPointerException) { null }
+    }
   }
 }

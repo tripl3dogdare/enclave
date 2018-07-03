@@ -2,15 +2,15 @@ package com.tripl3dogdare.enclave.network
 
 import com.tripl3dogdare.enclave.Enclave
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.havenjson.Json
+import com.tripl3dogdare.havenjson.JsonParser
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.format.Jackson.asJsonObject
 
 class Rest(val token:String, httpClient:HttpHandler=JavaHttpClient()) {
   val rateLimiter = RateLimiter(httpClient)
@@ -20,7 +20,7 @@ class Rest(val token:String, httpClient:HttpHandler=JavaHttpClient()) {
     path:String,
     vararg urlParams: Snowflake,
     query:Map<String, String>? = null,
-    data:JsonNode? = null
+    data:Json? = null
   ) = async {
     val req = Request(method, Enclave.API_URL+path.format(*urlParams))
       .header("User-Agent", "DiscordBot (${Enclave.WEBSITE}, ${Enclave.VERSION})")
@@ -29,11 +29,11 @@ class Rest(val token:String, httpClient:HttpHandler=JavaHttpClient()) {
       .let { req ->
         (query ?: emptyMap()).entries
           .fold(req) { acc, entry -> acc.query(entry.key, entry.value) }
-          .body(data?.toString() ?: "")
+          .body(data?.mkString() ?: "")
       }
     rateLimiter
       .queueRequest(path.format(urlParams.getOrElse(0) {""}), req)
-      .bodyString().asJsonObject()
+      .bodyString().let(JsonParser::parse)
   }
 
   fun sendSync(
@@ -41,7 +41,7 @@ class Rest(val token:String, httpClient:HttpHandler=JavaHttpClient()) {
     path:String,
     vararg urlParams: Snowflake,
     query:Map<String, String>? = null,
-    data:JsonNode? = null
+    data:Json? = null
   ) =
     runBlocking { send(method, path, *urlParams, query=query, data=data).await() }
 }
