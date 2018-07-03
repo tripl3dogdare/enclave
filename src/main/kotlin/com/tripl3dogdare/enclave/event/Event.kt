@@ -1,16 +1,14 @@
 package com.tripl3dogdare.enclave.event
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.tripl3dogdare.enclave.Enclave
-import com.tripl3dogdare.enclave.Enclave.Companion.with
-import com.tripl3dogdare.enclave.data.Message
+import com.tripl3dogdare.havenjson.Json
 
 interface Event {
-//  val raw:JsonNode
+//  val raw:Json
   val client:Enclave
 
   companion object {
-    fun from(name:String, data:JsonNode, client:Enclave):Event = when(name) {
+    fun from(name:String, data:Json, client:Enclave):Event = when(name) {
       "READY" -> ReadyEvent(data, client)
       "RESUMED" -> ResumedEvent(data, client)
       "CHANNEL_CREATE" -> ChannelCreateEvent(data, client)
@@ -31,9 +29,9 @@ interface Event {
       "GUILD_ROLE_CREATE" -> RoleCreateEvent(data, client)
       "GUILD_ROLE_UPDATE" -> RoleUpdateEvent(data, client)
       "GUILD_ROLE_DELETE" -> RoleDeleteEvent(data, client)
-      "MESSAGE_CREATE" -> Enclave.mapJson(data, MessageCreateEvent::class)
-      "MESSAGE_UPDATE" -> Enclave.mapJson(data, MessageUpdateEvent::class)
-      "MESSAGE_DELETE" -> Enclave.mapJson(data, MessageDeleteEvent::class)
+      "MESSAGE_CREATE" -> MessageCreateEvent.fromJson(data, client)!!
+      "MESSAGE_UPDATE" -> MessageUpdateEvent.fromJson(data, client)!!
+      "MESSAGE_DELETE" -> MessageDeleteEvent.fromJson(data, client)!!
       "MESSAGE_DELETE_BULK" -> MessageBulkDeleteEvent(data, client)
       "MESSAGE_REACTION_ADD" -> ReactionAddEvent(data, client)
       "MESSAGE_REACTION_REMOVE" -> ReactionRemoveEvent(data, client)
@@ -53,51 +51,51 @@ interface Event {
  * Default event object used for events that do not have a defined type.
  * You should never encounter this under normal circumstances.
  */
-data class UnknownEvent(val name:String, val raw:JsonNode, override val client:Enclave) : Event
+data class UnknownEvent(val name:String, val raw:Json, override val client:Enclave) : Event
 
 // Event stubs
 // TODO: Remove as proper event classes are added
-data class ReadyEvent(val raw:JsonNode, override val client:Enclave) : Event
-data class ResumedEvent(val raw:JsonNode, override val client:Enclave) : Event
+data class ReadyEvent(val raw:Json, override val client:Enclave) : Event
+data class ResumedEvent(val raw:Json, override val client:Enclave) : Event
 
 interface ChannelEvent : Event
-data class ChannelCreateEvent(val raw:JsonNode, override val client:Enclave) : ChannelEvent
-data class ChannelUpdateEvent(val raw:JsonNode, override val client:Enclave) : ChannelEvent
-data class ChannelDeleteEvent(val raw:JsonNode, override val client:Enclave) : ChannelEvent
+data class ChannelCreateEvent(val raw:Json, override val client:Enclave) : ChannelEvent
+data class ChannelUpdateEvent(val raw:Json, override val client:Enclave) : ChannelEvent
+data class ChannelDeleteEvent(val raw:Json, override val client:Enclave) : ChannelEvent
 
-data class PinEvent(val raw:JsonNode, override val client:Enclave) : Event
+data class PinEvent(val raw:Json, override val client:Enclave) : Event
 
 interface GuildEvent : Event
-data class GuildCreateEvent(val raw:JsonNode, override val client:Enclave) : GuildEvent
-data class GuildUpdateEvent(val raw:JsonNode, override val client:Enclave) : GuildEvent
-data class GuildDeleteEvent(val raw:JsonNode, override val client:Enclave) : GuildEvent
+data class GuildCreateEvent(val raw:Json, override val client:Enclave) : GuildEvent
+data class GuildUpdateEvent(val raw:Json, override val client:Enclave) : GuildEvent
+data class GuildDeleteEvent(val raw:Json, override val client:Enclave) : GuildEvent
 
 interface BanEvent : Event
-data class BanAddEvent(val raw:JsonNode, override val client:Enclave) : BanEvent
-data class BanRemoveEvent(val raw:JsonNode, override val client:Enclave) : BanEvent
+data class BanAddEvent(val raw:Json, override val client:Enclave) : BanEvent
+data class BanRemoveEvent(val raw:Json, override val client:Enclave) : BanEvent
 
-data class EmojiUpdateEvent(val raw:JsonNode, override val client:Enclave) : Event
-data class IntegrationUpdateEvent(val raw:JsonNode, override val client:Enclave) : Event
+data class EmojiUpdateEvent(val raw:Json, override val client:Enclave) : Event
+data class IntegrationUpdateEvent(val raw:Json, override val client:Enclave) : Event
 
 interface MemberEvent : Event
-data class MemberAddEvent(val raw:JsonNode, override val client:Enclave) : MemberEvent
-data class MemberRemoveEvent(val raw:JsonNode, override val client:Enclave) : MemberEvent
-data class MemberUpdateEvent(val raw:JsonNode, override val client:Enclave) : MemberEvent
-data class MemberChunkEvent(val raw:JsonNode, override val client:Enclave) : Event
+data class MemberAddEvent(val raw:Json, override val client:Enclave) : MemberEvent
+data class MemberRemoveEvent(val raw:Json, override val client:Enclave) : MemberEvent
+data class MemberUpdateEvent(val raw:Json, override val client:Enclave) : MemberEvent
+data class MemberChunkEvent(val raw:Json, override val client:Enclave) : Event
 
 interface RoleEvent : Event
-data class RoleCreateEvent(val raw:JsonNode, override val client:Enclave) : RoleEvent
-data class RoleUpdateEvent(val raw:JsonNode, override val client:Enclave) : RoleEvent
-data class RoleDeleteEvent(val raw:JsonNode, override val client:Enclave) : RoleEvent
+data class RoleCreateEvent(val raw:Json, override val client:Enclave) : RoleEvent
+data class RoleUpdateEvent(val raw:Json, override val client:Enclave) : RoleEvent
+data class RoleDeleteEvent(val raw:Json, override val client:Enclave) : RoleEvent
 
 interface ReactionEvent : Event
-data class ReactionAddEvent(val raw:JsonNode, override val client:Enclave) : ReactionEvent
-data class ReactionRemoveEvent(val raw:JsonNode, override val client:Enclave) : ReactionEvent
-data class ReactionRemoveAllEvent(val raw:JsonNode, override val client:Enclave) : ReactionEvent
+data class ReactionAddEvent(val raw:Json, override val client:Enclave) : ReactionEvent
+data class ReactionRemoveEvent(val raw:Json, override val client:Enclave) : ReactionEvent
+data class ReactionRemoveAllEvent(val raw:Json, override val client:Enclave) : ReactionEvent
 
-data class PresenceUpdateEvent(val raw:JsonNode, override val client:Enclave) : Event
-data class TypingStartEvent(val raw:JsonNode, override val client:Enclave) : Event
-data class UserUpdateEvent(val raw:JsonNode, override val client:Enclave) : Event
-data class VoiceStateUpdateEvent(val raw:JsonNode, override val client:Enclave) : Event
-data class VoiceServerUpdateEvent(val raw:JsonNode, override val client:Enclave) : Event
-data class WebhooksUpdateEvent(val raw:JsonNode, override val client:Enclave) : Event
+data class PresenceUpdateEvent(val raw:Json, override val client:Enclave) : Event
+data class TypingStartEvent(val raw:Json, override val client:Enclave) : Event
+data class UserUpdateEvent(val raw:Json, override val client:Enclave) : Event
+data class VoiceStateUpdateEvent(val raw:Json, override val client:Enclave) : Event
+data class VoiceServerUpdateEvent(val raw:Json, override val client:Enclave) : Event
+data class WebhooksUpdateEvent(val raw:Json, override val client:Enclave) : Event
