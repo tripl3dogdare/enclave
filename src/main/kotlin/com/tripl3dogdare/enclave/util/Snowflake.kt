@@ -1,6 +1,5 @@
 package com.tripl3dogdare.enclave.util
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import unsigned.Ulong
 
 class Snowflake(val value:Ulong) {
@@ -10,8 +9,10 @@ class Snowflake(val value:Ulong) {
   val processId = (value and 0x1F000) shr 12
   val increment = value and 0xFFF
 
-  @JsonCreator constructor(from:String) : this(Ulong(from))
   override fun toString() = value.v.toString()
+  companion object {
+    fun fromString(raw:String?) = raw?.let { Snowflake(Ulong(it)) }
+  }
 }
 
 interface IdObjectNullable {
