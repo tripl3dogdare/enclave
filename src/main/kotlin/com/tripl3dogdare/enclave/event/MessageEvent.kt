@@ -4,11 +4,10 @@ import com.tripl3dogdare.enclave.Enclave
 import com.tripl3dogdare.enclave.data.Message
 import com.tripl3dogdare.enclave.data.MessageLike
 import com.tripl3dogdare.enclave.util.IdObject
-import com.tripl3dogdare.enclave.util.Respondable
 import com.tripl3dogdare.enclave.util.Snowflake
 import com.tripl3dogdare.havenjson.Json
 
-abstract class MessageEvent : Event, Respondable() {
+abstract class MessageEvent : Event {
   abstract val channelId: Snowflake
 }
 
