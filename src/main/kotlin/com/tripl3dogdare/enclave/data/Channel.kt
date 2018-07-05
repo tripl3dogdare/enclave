@@ -2,6 +2,7 @@ package com.tripl3dogdare.enclave.data
 
 import com.tripl3dogdare.enclave.util.IdObject
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.enclave.util.unassertNotNull
 import com.tripl3dogdare.havenjson.Json
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -28,7 +29,7 @@ data class Channel(
   enum class Type { GUILD_TEXT, DM, GUILD_VOICE, GROUP_DM, GUILD_CATEGORY }
 
   companion object {
-    fun fromJson(raw:Json) = try { Channel(
+    fun fromJson(raw:Json) = unassertNotNull { Channel(
       id = Snowflake.fromString(raw["id"].asString)!!,
       type = Type.values()[raw["type"].asInt!!],
       guildId = Snowflake.fromString(raw["guild_id"].asString!!),
@@ -47,7 +48,7 @@ data class Channel(
       lastPinTimestamp =
         if(raw["last_pin_timestamp"].value != null) ZonedDateTime.parse(raw["last_pin_timestamp"].asString!!)
         else null
-    )} catch(_:NullPointerException) { null }
+    )}
   }
 }
 
@@ -60,7 +61,7 @@ data class Webhook(
   val avatar:String?,
   val token:String
 ) : IdObject { companion object {
-  fun fromJson(raw:Json) = try { Webhook(
+  fun fromJson(raw:Json) = unassertNotNull { Webhook(
     id = Snowflake.fromString(raw["id"].asString)!!,
     guildId = Snowflake.fromString(raw["guild_id"].asString),
     channelId = Snowflake.fromString(raw["channel_id"].asString)!!,
@@ -68,5 +69,5 @@ data class Webhook(
     name = raw["name"].asString,
     avatar = raw["avatar"].asString,
     token = raw["token"].asString!!
-  )} catch(_:NullPointerException) { null }
+  )}
 }}

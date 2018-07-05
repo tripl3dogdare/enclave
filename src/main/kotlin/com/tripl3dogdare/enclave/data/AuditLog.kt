@@ -1,6 +1,7 @@
 package com.tripl3dogdare.enclave.data
 
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.enclave.util.unassertNotNull
 import com.tripl3dogdare.havenjson.Json
 
 data class AuditLog(
@@ -9,11 +10,11 @@ data class AuditLog(
   val entries:List<Entry>
 ) {
   companion object {
-    fun fromJson(raw:Json) = try { AuditLog(
+    fun fromJson(raw:Json) = unassertNotNull { AuditLog(
       webhooks = raw["webhooks"].asList.orEmpty().map(Webhook.Companion::fromJson).filterNotNull(),
       users = raw["users"].asList.orEmpty().map(User.Companion::fromJson).filterNotNull(),
       entries = raw["audit_log_entries"].asList.orEmpty().map(Entry.Companion::fromJson).filterNotNull()
-    )} catch(_:NullPointerException) { null }
+    )}
 }
 
   data class Entry(
@@ -25,7 +26,7 @@ data class AuditLog(
     val options:Options?,
     val reason:String?
   ) { companion object {
-    fun fromJson(raw:Json) = try { Entry(
+    fun fromJson(raw:Json) = unassertNotNull { Entry(
       targetId = Snowflake.fromString(raw["target_id"].asString),
       changes = raw["changes"].asList.orEmpty().map { Change(raw["new_value"], raw["old_value"], raw["key"].asString!!)},
       userId = Snowflake.fromString(raw["user_id"].asString)!!,
@@ -33,7 +34,7 @@ data class AuditLog(
       actionType = Event.fromInt(raw["action_type"].asInt)!!,
       options = Options.fromJson(raw["options"]),
       reason = raw["reason"].asString
-    )} catch(_:NullPointerException) { null }
+    )}
   }}
 
   data class Change(
@@ -51,7 +52,7 @@ data class AuditLog(
     val type:String?,
     val roleName:String?
   ) { companion object {
-    fun fromJson(raw:Json) = try { Options(
+    fun fromJson(raw:Json) = unassertNotNull { Options(
       deleteMemberDays = raw["delete_member_days"].asString,
       membersRemoved = raw["members_removed"].asString,
       channelId = Snowflake.fromString(raw["channel_id"].asString),
@@ -59,7 +60,7 @@ data class AuditLog(
       id = Snowflake.fromString(raw["id"].asString),
       type = raw["type"].asString,
       roleName = raw["role_name"].asString
-    )} catch(_:NullPointerException) { null }
+    )}
   }}
 
   enum class Event(val eventId:Int) {

@@ -1,6 +1,7 @@
 package com.tripl3dogdare.enclave.data
 
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.enclave.util.unassertNotNull
 import com.tripl3dogdare.havenjson.Json
 import java.util.*
 
@@ -42,7 +43,7 @@ fun Permissions.toInt() = this.toTypedArray().fold(0) { a, b -> a or b.value }
 infix fun Permissions.and(other:Permission):Permissions = Permissions.of(other, *this.toTypedArray())
 
 fun permissionsFrom(raw:Json) =
-  try { permissionsFrom(raw.asInt!!) } catch(_:NullPointerException) { null }
+  unassertNotNull { permissionsFrom(raw.asInt!!) }
 fun permissionsFrom(n:Int):Permissions {
   val perms = Permission.values().filter { n and it.value != 0 }
   return Permissions.of(perms[0], *perms.drop(1).toTypedArray())
@@ -54,10 +55,10 @@ data class PermissionOverwrite(
   val allow:Permissions,
   val deny:Permissions
 ) { companion object {
-  fun fromJson(raw:Json) = try { PermissionOverwrite(
+  fun fromJson(raw:Json) = unassertNotNull { PermissionOverwrite(
     id = Snowflake.fromString(raw["id"].asString)!!,
     type = raw["type"].asString!!,
     allow = permissionsFrom(raw["allow"])!!,
     deny = permissionsFrom(raw["deny"])!!
-  )} catch(_:NullPointerException) { null }
+  )}
 }}

@@ -3,6 +3,7 @@ package com.tripl3dogdare.enclave.data
 import com.tripl3dogdare.enclave.util.IdObject
 import com.tripl3dogdare.enclave.util.IdObjectNullable
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.enclave.util.unassertNotNull
 import com.tripl3dogdare.havenjson.Json
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -42,7 +43,7 @@ data class Guild(
   val joinedAt:ZonedDateTime?
 ) : IdObject {
   companion object {
-    fun fromJson(raw:Json) = try { Guild(
+    fun fromJson(raw:Json) = unassertNotNull { Guild(
       id = Snowflake.fromString(raw["id"].asString)!!,
       name = raw["name"].asString!!,
       icon = raw["icon"].asString,
@@ -73,19 +74,17 @@ data class Guild(
       channels = raw["channels"].asList.orEmpty().map(Channel.Companion::fromJson).filterNotNull(),
       presences = raw["presences"].asList.orEmpty().map(Presence.Companion::fromJson).filterNotNull(),
       joinedAt = raw["joined_at"].asString?.let { ZonedDateTime.parse(it) }
-    )} catch(_:NullPointerException) { null }
+    )}
   }
 
   data class Embed(val enabled:Boolean, val channelId: Snowflake?) { companion object {
     fun fromJson(raw:Json) =
-      try { Embed(raw["enabled"].asBoolean!!, Snowflake.fromString(raw["channel_id"].asString))}
-      catch(_:NullPointerException) { null }
+      unassertNotNull { Embed(raw["enabled"].asBoolean!!, Snowflake.fromString(raw["channel_id"].asString)) }
   }}
 
   data class Ban(val reason:String?, val user:User) { companion object {
     fun fromJson(raw:Json) =
-      try { Ban(raw["reason"].asString, User.fromJson(raw["user"])!!)}
-      catch(_:NullPointerException) { null }
+      unassertNotNull { Ban(raw["reason"].asString, User.fromJson(raw["user"])!!) }
   }}
 
   data class Emoji(
@@ -97,7 +96,7 @@ data class Guild(
     val managed:Boolean?,
     val animated:Boolean?
   ) : IdObjectNullable { companion object {
-    fun fromJson(raw:Json) = try { Emoji(
+    fun fromJson(raw:Json) = unassertNotNull { Emoji(
       id = Snowflake.fromString(raw["id"].asString),
       name = raw["name"].asString!!,
       roles = raw["roles"].asList.orEmpty().map { Snowflake.fromString(it.asString) }.filterNotNull(),
@@ -105,7 +104,7 @@ data class Guild(
       requireColons = raw["require_colons"].asBoolean,
       managed = raw["managed"].asBoolean,
       animated = raw["animated"].asBoolean
-    )} catch(_:NullPointerException) { null }
+    )}
   }}
 
   data class Invite(
@@ -115,13 +114,13 @@ data class Guild(
     val approximatePresenceCount:Int?,
     val approximateMemberCount:Int?
   ) { companion object {
-    fun fromJson(raw:Json) = try { Invite(
+    fun fromJson(raw:Json) = unassertNotNull { Invite(
       code = raw["code"].asString!!,
       guild = Guild.fromJson(raw["guild"])!!,
       channel = Channel.fromJson(raw["channel"])!!,
       approximatePresenceCount = raw["approximate_presence_count"].asInt,
       approximateMemberCount = raw["approximate_member_count"].asInt
-    )} catch(_:NullPointerException) { null }
+    )}
   }}
 
   data class InviteMetadata(
@@ -133,7 +132,7 @@ data class Guild(
     val revoked:Boolean,
     val createdAt: ZonedDateTime
   ) { companion object {
-    fun fromJson(raw:Json) = try { InviteMetadata(
+    fun fromJson(raw:Json) = unassertNotNull { InviteMetadata(
       inviter = User.fromJson(raw["user"])!!,
       uses = raw["uses"].asInt!!,
       maxUses = raw["max_uses"].asInt!!,
@@ -141,7 +140,7 @@ data class Guild(
       temporary = raw["temporary"].asBoolean!!,
       revoked = raw["revoked"].asBoolean!!,
       createdAt = ZonedDateTime.parse(raw["created_at"].asString!!)
-    )} catch(_:NullPointerException) { null }
+    )}
   }}
 
   enum class DefaultMessageNotificationLevel { ALL_MESSAGES, ONLY_MENTIONS }
@@ -160,7 +159,7 @@ data class Role(
   val managed:Boolean,
   val mentionable:Boolean
 ) : IdObject { companion object {
-  fun fromJson(raw:Json) = try { Role(
+  fun fromJson(raw:Json) = unassertNotNull { Role(
     id = Snowflake.fromString(raw["id"].asString)!!,
     name = raw["name"].asString!!,
     color = raw["color"].asInt!!,
@@ -169,7 +168,7 @@ data class Role(
     permissions = permissionsFrom(raw["permissions"])!!,
     managed = raw["managed"].asBoolean!!,
     mentionable = raw["mentionable"].asBoolean!!
-  )} catch(_:NullPointerException) { null }
+  )}
 }}
 
 
@@ -189,7 +188,7 @@ data class Integration(
   data class Account(val id:String, val name:String)
 
   companion object {
-    fun fromJson(raw:Json) = try { Integration(
+    fun fromJson(raw:Json) = unassertNotNull { Integration(
       id = Snowflake.fromString(raw["id"].asString)!!,
       name = raw["name"].asString!!,
       type = raw["type"].asString!!,
@@ -201,6 +200,6 @@ data class Integration(
       user = User.fromJson(raw["user"])!!,
       account = Account(raw["account"]["id"].asString!!, raw["account"]["name"].asString!!),
       syncedAt = raw["synced_at"].asString?.let { ZonedDateTime.parse(it) }
-    )} catch(_:NullPointerException) { null }
+    )}
   }
 }

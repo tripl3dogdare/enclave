@@ -2,6 +2,7 @@ package com.tripl3dogdare.enclave.data
 
 import com.tripl3dogdare.enclave.util.IdObject
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.enclave.util.unassertNotNull
 import com.tripl3dogdare.havenjson.Json
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -27,7 +28,7 @@ data class User(
   override val verified:Boolean?,
   override val email:String?
 ) : UserLike { companion object {
-  fun fromJson(raw:Json) = try { User(
+  fun fromJson(raw:Json) = unassertNotNull { User(
     id = Snowflake.fromString(raw["id"].asString)!!,
     username = raw["username"].asString!!,
     discriminator = raw["discriminator"].asString!!,
@@ -36,7 +37,7 @@ data class User(
     mfaEnabled = raw["mfa_enabled"].asBoolean,
     verified = raw["verified"].asBoolean,
     email = raw["email"].asString
-  )} catch(_:NullPointerException) { null }
+  )}
 }}
 
 data class Member(
@@ -48,14 +49,14 @@ data class Member(
   val joinedAt: ZonedDateTime?
 ) : UserLike by user { companion object {
   fun fromJson(raw:Json) = fromJson(raw, raw["user"])
-  fun fromJson(raw:Json, user:Json) = try { Member(
+  fun fromJson(raw:Json, user:Json) = unassertNotNull { Member(
     user = User.fromJson(user)!!,
     nick = raw["nick"].asString,
     roles = raw["roles"].asList.orEmpty().map { Snowflake.fromString(it.asString) }.filterNotNull(),
     deaf = raw["deaf"].asBoolean!!,
     mute = raw["mute"].asBoolean!!,
     joinedAt = raw["joined_at"].asString?.let { ZonedDateTime.parse(it) }
-  )} catch(_:NullPointerException) { null }
+  )}
 }}
 
 data class UserConnection(
@@ -65,13 +66,13 @@ data class UserConnection(
   val revoked:Boolean,
   val integrations:List<Integration>
 ) { companion object {
-  fun fromJson(raw:Json) = try { UserConnection(
+  fun fromJson(raw:Json) = unassertNotNull { UserConnection(
     id = raw["id"].asString!!,
     name = raw["name"].asString!!,
     type = raw["type"].asString!!,
     revoked = raw["revoked"].asBoolean!!,
     integrations = raw["integrations"].asList.orEmpty().map(Integration.Companion::fromJson).filterNotNull()
-  )} catch(e:NullPointerException) { null }
+  )}
 }}
 
 data class Presence(
@@ -84,13 +85,13 @@ data class Presence(
   enum class Status { IDLE, DND, ONLINE, OFFLINE; }
 
   companion object {
-    fun fromJson(raw:Json) = try { Presence(
+    fun fromJson(raw:Json) = unassertNotNull { Presence(
       user = User.fromJson(raw["user"])!!,
       roles = raw["roles"].asList.orEmpty().map { Snowflake.fromString(it.asString) }.filterNotNull(),
       game = Activity.fromJson(raw["game"]),
       guildId = Snowflake.fromString(raw["guild_id"].asString)!!,
       status = Status.valueOf(raw["status"].asString!!.toUpperCase())
-    )} catch(e:NullPointerException) { null }
+    )}
   }
 
   data class Activity(
@@ -115,7 +116,7 @@ data class Presence(
     )
 
     companion object {
-      fun fromJson(raw:Json) = try { Activity(
+      fun fromJson(raw:Json) = unassertNotNull { Activity(
         name = raw["name"].asString!!,
         type = Type.values()[raw["type"].asInt!!],
         url = raw["url"].asString,
@@ -135,7 +136,7 @@ data class Presence(
           it["small_image"]?.asString,
           it["small_text"]?.asString
         )}
-      )} catch(e:NullPointerException) { null }
+      )}
     }
   }
 }

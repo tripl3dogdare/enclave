@@ -2,6 +2,7 @@ package com.tripl3dogdare.enclave.data
 
 import com.tripl3dogdare.enclave.util.IdObject
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.enclave.util.unassertNotNull
 import com.tripl3dogdare.havenjson.Json
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -57,7 +58,7 @@ data class Message(
   override val editedTimestamp:ZonedDateTime?
 ) : MessageLike {
   companion object {
-    fun fromJson(raw:Json) = try { Message(
+    fun fromJson(raw:Json) = unassertNotNull { Message(
       id =              Snowflake.fromString(raw["id"].asString)!!,
       channelId =       Snowflake.fromString(raw["channel_id"].asString)!!,
       guildId =         Snowflake.fromString(raw["guild_id"].asString),
@@ -86,7 +87,7 @@ data class Message(
         if(raw["member"]["user"].value != null) Member.fromJson(raw["member"])
         else if(raw["member"].value != null) Member.fromJson(raw["member"], raw["author"])
         else null
-    )} catch(e:NullPointerException) { null }
+    )}
   }
 
   enum class Type {
@@ -104,8 +105,7 @@ data class Message(
     enum class Type { JOIN, SPECTATE, LISTEN, JOIN_REQUEST }
     companion object {
       fun fromJson(raw:Json) =
-        try { Activity(Type.values()[raw["type"].asInt!!], raw["party_id"].asString) }
-        catch (_:NullPointerException) { null }
+        unassertNotNull { Activity(Type.values()[raw["type"].asInt!!], raw["party_id"].asString) }
     }
   }
 
@@ -117,13 +117,13 @@ data class Message(
     val name:String
   ) : IdObject {
     companion object {
-      fun fromJson(raw:Json) = try { Application(
+      fun fromJson(raw:Json) = unassertNotNull { Application(
         id = Snowflake.fromString(raw["id"].asString)!!,
         coverImage = raw["cover_image"].asString!!,
         description = raw["description"].asString!!,
         icon = raw["icon"].asString!!,
         name = raw["name"].asString!!
-      )} catch(_:NullPointerException) { null }
+      )}
     }
   }
 
@@ -132,11 +132,11 @@ data class Message(
     val me:Boolean,
     val emoji:Guild.Emoji
   ) { companion object {
-    fun fromJson(raw:Json) = try { Reaction(
+    fun fromJson(raw:Json) = unassertNotNull { Reaction(
       count = raw["count"].asInt!!,
       me = raw["me"].asBoolean!!,
       emoji = Guild.Emoji.fromJson(raw["emoji"])!!
-    )} catch(_:NullPointerException) { null }
+    )}
   }}
 
   data class Embed(
@@ -162,7 +162,7 @@ data class Message(
     data class Author(val name:String?, val url:String?, val iconUrl:String?, val proxyIconUrl:String?)
 
     companion object {
-      fun fromJson(raw:Json) = try { Embed(
+      fun fromJson(raw:Json) = unassertNotNull { Embed(
         title = raw["title"].asString,
         type = raw["type"].asString,
         description = raw["description"].asString,
@@ -208,7 +208,7 @@ data class Message(
           ) else null,
         fields = raw["fields"].asList?.map { Field(it["name"].asString, it["value"].asString, it["inline"].asBoolean)},
         timestamp = raw["timestamp"].asString?.let { ZonedDateTime.parse(it) }
-      )} catch(_:NullPointerException) { null }
+      )}
     }
   }
 
@@ -221,7 +221,7 @@ data class Message(
     val height:Int?,
     val width:Int?
   ) : IdObject { companion object {
-    fun fromJson(raw:Json) = try { Attachment(
+    fun fromJson(raw:Json) = unassertNotNull { Attachment(
       id = Snowflake.fromString(raw["id"].asString)!!,
       filename = raw["filename"].asString!!,
       size = raw["size"].asInt!!,
@@ -229,6 +229,6 @@ data class Message(
       proxyUrl = raw["proxy_url"].asString!!,
       height = raw["height"].asInt,
       width = raw["width"].asInt
-    )} catch(_:NullPointerException) { null }
+    )}
   }}
 }

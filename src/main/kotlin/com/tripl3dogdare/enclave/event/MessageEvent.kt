@@ -5,6 +5,7 @@ import com.tripl3dogdare.enclave.data.Message
 import com.tripl3dogdare.enclave.data.MessageLike
 import com.tripl3dogdare.enclave.util.IdObject
 import com.tripl3dogdare.enclave.util.Snowflake
+import com.tripl3dogdare.enclave.util.unassertNotNull
 import com.tripl3dogdare.havenjson.Json
 
 abstract class MessageEvent : Event {
@@ -16,8 +17,7 @@ data class MessageCreateEvent(
   override val client:Enclave
 ) : MessageEvent(), MessageLike by message { companion object {
   fun fromJson(raw:Json, client:Enclave) =
-    try { MessageCreateEvent(Message.fromJson(raw)!!, client) }
-    catch(e:NullPointerException) { null }
+    unassertNotNull { MessageCreateEvent(Message.fromJson(raw)!!, client) }
 }}
 
 data class MessageUpdateEvent(
@@ -25,8 +25,7 @@ data class MessageUpdateEvent(
   override val client:Enclave
 ) : MessageEvent(), MessageLike by message{ companion object {
   fun fromJson(raw:Json, client:Enclave) =
-    try { MessageUpdateEvent(Message.fromJson(raw)!!, client) }
-    catch(e:NullPointerException) { null }
+    unassertNotNull { MessageUpdateEvent(Message.fromJson(raw)!!, client) }
 }}
 
 
@@ -35,11 +34,11 @@ data class MessageDeleteEvent(
   override val channelId:Snowflake,
   override val client:Enclave
 ) : MessageEvent(), IdObject { companion object {
-  fun fromJson(raw:Json, client:Enclave) = try { MessageDeleteEvent(
+  fun fromJson(raw:Json, client:Enclave) = unassertNotNull { MessageDeleteEvent(
     Snowflake.fromString(raw["id"].asString)!!,
     Snowflake.fromString(raw["channel_id"].asString)!!,
     client
-  )} catch(e:NullPointerException) { null }
+  )}
 }}
 
 
